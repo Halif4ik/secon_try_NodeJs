@@ -1,4 +1,6 @@
 # Project exclude paths
 /node_modules/
-/src/index.js
+/dist/routes
+/dist/routs
+/dist/index.js
 .idea
