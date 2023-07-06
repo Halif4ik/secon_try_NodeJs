@@ -7,12 +7,11 @@ const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const products_route_1 = require("./routes/products_route");
 const prodAll_router_1 = require("./routes/prodAll-router");
-const parserMiddleWare = (0, body_parser_1.default)({});
+const port = process.env.PORT || 3000;
 const exprApp = (0, express_1.default)();
-exprApp.use(parserMiddleWare);
+exprApp.use((0, body_parser_1.default)({}));
 exprApp.use('/products', products_route_1.productsRoute);
 exprApp.use('/productsAll', prodAll_router_1.allProductsRoute);
-const port = 3000;
 /*start express App*/
 exprApp.listen(port, () => {
     console.log(`Example MYapp listening on port ${port}`);

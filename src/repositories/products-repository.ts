@@ -1,10 +1,12 @@
 interface IProduct {
-    title?: string
+    title: string
+    email?: string
     id?: number
 }
 
 const products: Array<IProduct> = [{title: 'tomato', 'id': 1} as IProduct,
     {title: 'banana', 'id': 2} as IProduct, {title: 'cucumber', 'id': 3} as IProduct]
+
 export const productsRepository = {
     findByTitle(title: string | null): IProduct | undefined {
         let result: IProduct | undefined;
@@ -23,7 +25,8 @@ export const productsRepository = {
     getAllProd(): IProduct[] {
         return products;
     },
-    createProduct(title: string): IProduct {
+
+    createProduct(title: string, email: string): IProduct {
         let newId: number = Math.round(Math.random() * 10) + 3;
         const containsThisId: boolean = products.some(function (product) {
             return product.id === newId;
@@ -33,11 +36,13 @@ export const productsRepository = {
         newId = containsThisId ? temp : newId;
         let newProd = {
             title: title,
+            email: email,
             id: newId
         } as IProduct
         products.push(newProd);
         return newProd;
     },
+
     updateProduct(title: string, id: number): boolean {
         const foundProduct: IProduct | undefined = products.find(function (product) {
             return product.id === +id;

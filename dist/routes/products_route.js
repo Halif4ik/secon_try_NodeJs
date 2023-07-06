@@ -2,8 +2,30 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.productsRoute = void 0;
 const express_1 = require("express");
-const products_repository_1 = require("./products-repository");
+const products_repository_1 = require("../repositories/products-repository");
+const express_validator_1 = require("express-validator");
 exports.productsRoute = (0, express_1.Router)({});
+function titleValidMiddleware() {
+    return (0, express_validator_1.body)('title').trim().isLength({ min: 3, max: 10 }).escape().withMessage("Min length should be 3");
+}
+function emailValidMiddleware() {
+    return (0, express_validator_1.body)('email').isEmail().withMessage("Email should be email");
+}
+function checkValidationInMiddleWare(req, res, next) {
+    const errors = (0, express_validator_1.validationResult)(req);
+    if (errors.isEmpty()) {
+        next();
+    }
+    else {
+        res.status(400).send({ errors: errors.array() });
+    }
+}
+exports.productsRoute.post('/', titleValidMiddleware(), emailValidMiddleware(), checkValidationInMiddleWare, (req, res) => {
+    const title = req.body.title;
+    const email = req.body.email;
+    const newProd = products_repository_1.productsRepository.createProduct(title, email);
+    newProd ? res.status(201).send(newProd) : res.sendStatus(404);
+});
 exports.productsRoute.get('/', (req, res) => {
     const title = req.query.title;
     const foundProd = products_repository_1.productsRepository.findByTitle(title);
@@ -17,15 +39,9 @@ exports.productsRoute.get('/:ID', (req, res) => {
 exports.productsRoute.delete('/:ID', (req, res) => {
     const uriProdID = req.params.ID;
     const findedProduct = products_repository_1.productsRepository.deleteProduct(+uriProdID);
-    console.log('findedProduct-', findedProduct);
     findedProduct ? res.status(204).send(findedProduct) : res.sendStatus(404);
 });
-exports.productsRoute.post('/', (req, res) => {
-    const title = req.body.title;
-    const newProd = products_repository_1.productsRepository.createProduct(title);
-    newProd ? res.status(201).send(newProd) : res.sendStatus(404);
-});
-exports.productsRoute.put('/:ID', (req, res) => {
+exports.productsRoute.put('/:ID', titleValidMiddleware(), (req, res) => {
     const iDFromReqParams = req.params.ID;
     const titleInBody = req.body.title;
     const isUpdated = products_repository_1.productsRepository.updateProduct(titleInBody, +iDFromReqParams);
