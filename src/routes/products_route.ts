@@ -1,6 +1,6 @@
 import {NextFunction, Request, Response, Router} from "express";
 import {productsRepository} from "../repositories/products-repository";
-import {body, validationResult} from 'express-validator'
+import {body,query, validationResult} from 'express-validator'
 
 export const productsRoute = Router({})
 
@@ -12,16 +12,22 @@ function emailValidMiddleware() {
     return body('email').isEmail().withMessage("Email should be email");
 }
 
-function checkValidationInMiddleWare(req: Request, res: Response, next: NextFunction) {
+
+export function checkValidationInMiddleWare(req: Request, res: Response, next: NextFunction) {
     const errors = validationResult(req);
-    if (errors.isEmpty()) {
-        next();
-    } else {
+    if (errors.isEmpty()) next();
+    else {
         res.status(400).send({errors: errors.array()});
     }
 }
 
 productsRoute.post('/', titleValidMiddleware(), emailValidMiddleware(), checkValidationInMiddleWare, (req: Request, res: Response) => {
+    const autorHeders: string | undefined = req.headers.authorization;
+    if (autorHeders) {
+        const cutAuth = autorHeders.substring(autorHeders.indexOf(' ') + 1);
+        console.log('cutAuth-', cutAuth);
+        console.log(cutAuth === 'aGFsbDoxMjM=');
+    }
     const title: string = req.body.title;
     const email: string = req.body.email;
     const newProd = productsRepository.createProduct(title, email);
@@ -55,3 +61,4 @@ productsRoute.put('/:ID', titleValidMiddleware(), (req: Request, res: Response) 
         res.status(204).send(updatedProd);
     } else res.sendStatus(404);
 })
+

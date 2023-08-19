@@ -51,6 +51,7 @@ export const productsRepository = {
         return !!foundProduct;
 
     },
+
     deleteProduct(id: number): IProduct | undefined {
         let deletedProduct: IProduct | undefined;
         for (let i = 0; i < products.length; i++) {

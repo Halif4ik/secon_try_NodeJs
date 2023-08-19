@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.productsRoute = void 0;
+exports.checkValidationInMiddleWare = exports.productsRoute = void 0;
 const express_1 = require("express");
 const products_repository_1 = require("../repositories/products-repository");
 const express_validator_1 = require("express-validator");
@@ -13,14 +13,20 @@ function emailValidMiddleware() {
 }
 function checkValidationInMiddleWare(req, res, next) {
     const errors = (0, express_validator_1.validationResult)(req);
-    if (errors.isEmpty()) {
+    if (errors.isEmpty())
         next();
-    }
     else {
         res.status(400).send({ errors: errors.array() });
     }
 }
+exports.checkValidationInMiddleWare = checkValidationInMiddleWare;
 exports.productsRoute.post('/', titleValidMiddleware(), emailValidMiddleware(), checkValidationInMiddleWare, (req, res) => {
+    const autorHeders = req.headers.authorization;
+    if (autorHeders) {
+        const cutAuth = autorHeders.substring(autorHeders.indexOf(' ') + 1);
+        console.log('cutAuth-', cutAuth);
+        console.log(cutAuth === 'aGFsbDoxMjM=');
+    }
     const title = req.body.title;
     const email = req.body.email;
     const newProd = products_repository_1.productsRepository.createProduct(title, email);
