@@ -1,26 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.checkValidationInMiddleWare = exports.productsRoute = void 0;
+exports.productsRoute = void 0;
 const express_1 = require("express");
 const products_repository_1 = require("../repositories/products-repository");
-const express_validator_1 = require("express-validator");
+const validator_1 = require("../midleware/validator");
 exports.productsRoute = (0, express_1.Router)({});
-function titleValidMiddleware() {
-    return (0, express_validator_1.body)('title').trim().isLength({ min: 3, max: 10 }).escape().withMessage("Min length should be 3");
-}
-function emailValidMiddleware() {
-    return (0, express_validator_1.body)('email').isEmail().withMessage("Email should be email");
-}
-function checkValidationInMiddleWare(req, res, next) {
-    const errors = (0, express_validator_1.validationResult)(req);
-    if (errors.isEmpty())
-        next();
-    else {
-        res.status(400).send({ errors: errors.array() });
-    }
-}
-exports.checkValidationInMiddleWare = checkValidationInMiddleWare;
-exports.productsRoute.post('/', titleValidMiddleware(), emailValidMiddleware(), checkValidationInMiddleWare, (req, res) => {
+exports.productsRoute.post('/', (0, validator_1.titleValidMiddleware)(), (0, validator_1.emailValidMiddleware)(), validator_1.checkValidationInMiddleWare, (req, res) => {
     const autorHeders = req.headers.authorization;
     if (autorHeders) {
         const cutAuth = autorHeders.substring(autorHeders.indexOf(' ') + 1);
@@ -47,7 +32,7 @@ exports.productsRoute.delete('/:ID', (req, res) => {
     const findedProduct = products_repository_1.productsRepository.deleteProduct(+uriProdID);
     findedProduct ? res.status(204).send(findedProduct) : res.sendStatus(404);
 });
-exports.productsRoute.put('/:ID', titleValidMiddleware(), (req, res) => {
+exports.productsRoute.put('/:ID', (0, validator_1.titleValidMiddleware)(), (req, res) => {
     const iDFromReqParams = req.params.ID;
     const titleInBody = req.body.title;
     const isUpdated = products_repository_1.productsRepository.updateProduct(titleInBody, +iDFromReqParams);

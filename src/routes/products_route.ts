@@ -1,25 +1,9 @@
 import {NextFunction, Request, Response, Router} from "express";
 import {productsRepository} from "../repositories/products-repository";
-import {body,query, validationResult} from 'express-validator'
+import {checkValidationInMiddleWare,titleValidMiddleware,emailValidMiddleware} from "../midleware/validator";
 
 export const productsRoute = Router({})
 
-function titleValidMiddleware() {
-    return body('title').trim().isLength({min: 3, max: 10}).escape().withMessage("Min length should be 3");
-}
-
-function emailValidMiddleware() {
-    return body('email').isEmail().withMessage("Email should be email");
-}
-
-
-export function checkValidationInMiddleWare(req: Request, res: Response, next: NextFunction) {
-    const errors = validationResult(req);
-    if (errors.isEmpty()) next();
-    else {
-        res.status(400).send({errors: errors.array()});
-    }
-}
 
 productsRoute.post('/', titleValidMiddleware(), emailValidMiddleware(), checkValidationInMiddleWare, (req: Request, res: Response) => {
     const autorHeders: string | undefined = req.headers.authorization;
